@@ -1,0 +1,28 @@
+syntax = "proto3";
+package tag;
+
+message UserId{
+    string type = 1;
+    string value = 2;
+}
+
+message User{
+    repeated UserId uids = 1;
+}
+
+message Tag{
+    uint64 id= 2;  //tag  类型
+    string name = 1;  // tag 名称
+    int32 update_time = 3; //tag 更新日期
+}
+
+message UserTag{
+    repeated Tag tags = 1;
+}
+
+
+
+service Tags{
+    rpc GetUserTags(User) returns (UserTag);
+}
+

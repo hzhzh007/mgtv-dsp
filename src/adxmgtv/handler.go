@@ -24,6 +24,7 @@ var (
 	LocaleRecordHost string
 )
 
+//TODO: here can do some other things like flow and frequency controll
 func BidHandler(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	clog := clog.NewContext("adx=mgtv_pmp")
 	defer clog.Flush()
@@ -49,7 +50,6 @@ func BidHandler(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 
 }
 
-//TODO: here can do some other things like flow and frequency controll
 func WinNoticeHandler(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	clog := clog.NewContext("adx=mgtv_win_notice")
 	defer clog.Flush()

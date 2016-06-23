@@ -1,9 +1,0 @@
-http_server:
-    listen : "0.0.0.0:7777"
-    max_conn : 655
-log:
-    #    path : "./log/adserver.log"
-    level : "DEBUG"
-redis:
-    addr : "127.0.0.1:6379"
-    pool_num: 2

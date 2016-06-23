@@ -71,8 +71,9 @@ func (a *Activity) SetFiltered() bool {
 }
 
 //TODO: implement it
+//sometimes it may the heart of the dsp
 func (a *Activity) GetECPM() int {
-	return a.Id
+	return a.MaxPrice
 }
 
 func (a *Activity) Price() int {
@@ -142,6 +143,7 @@ func (a *Activity) CreativeType() int {
 	return a.selectedCreative().Type
 }
 
+//just for log
 func (a *Activity) String(msg string) string {
-	return fmt.Sprintf("{activity:%d, creative:%d,%s}", a.Id, a.selectedCreative().Id, msg)
+	return fmt.Sprintf("{activity:%d,creative:%d,%s}", a.Id, a.selectedCreative().Id, msg)
 }

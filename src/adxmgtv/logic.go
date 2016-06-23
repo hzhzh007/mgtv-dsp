@@ -3,6 +3,7 @@ package adxmgtv
 import (
 	"common/bridge"
 	. "common/consts"
+	"fmt"
 	clog "github.com/hzhzh007/context_log"
 	"golang.org/x/net/context"
 	"logic"
@@ -18,7 +19,11 @@ func filterAd(ctx context.Context, request *BidRequest) (*logic.Activities, erro
 		clog.Error("get candidateAds error:%s", err)
 		return candidateAds, err
 	}
-	//	cl.Debug("row activities:%+v", *candidateAds)
+
+	//log some info
+	request.LogInfo(ctx, candidateAds)
+
+	clog.StartTimer()
 	/*
 	 *some filte logic
 	 */
@@ -32,15 +37,26 @@ func filterAd(ctx context.Context, request *BidRequest) (*logic.Activities, erro
 	//platform filter
 	platform, _ := request.GetPlatform(ctx)
 	candidateAds.PlatformFilter(ctx, platform)
+	clog.StopTimer("filter1_cost")
 
 	//tag filter
 	uids, _ := request.GetUids()
+
+	if len(uids) > 0 { //just for performance
+		clog.AddNotes("uid_t", uids[0].Type)
+		clog.AddNotes("uid", uids[0].Value)
+	}
 	clog.StartTimer()
 	userTags, err := tag.RequestTag(ctx, bridge.LogicUids2RpcUser(uids))
 	clog.StopTimer("tag_rpc")
-	candidateAds.UserTagFilter(ctx, bridge.RpcUserTag2LogicTag(userTags))
+	localTags := bridge.RpcUserTag2LogicTag(userTags)
+	clog.AddNotes("tags", fmt.Sprintf("%v", localTags))
+	candidateAds.UserTagFilter(ctx, localTags)
 
+	//first sort
+	clog.StartTimer()
 	candidateAds.Sort()
+	clog.StopTimer("sort1_cost")
 
 	//duplicate removal
 	candidateAds.CommonFilter(ctx, request.DuplicateRemovalFn(ctx), "mgtv reduplicate")

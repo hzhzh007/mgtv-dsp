@@ -1,14 +1,25 @@
 http_server:
     listen : "0.0.0.0:7777"
     max_conn : 655
+
 log:
     #    path : "./log/adserver.log"
     level : "DEBUG"
+
 redis:
     addr : "10.100.2.90:6379"
     pool_num: 2
 ip_lib: "data/ip.csv"
+
 tag:
     addr: "127.0.0.1:7779"
     pool_num: 10
     timeout: "200ms"
+
+mgtv:
+    bid_path: "/mgtv/bid"
+    notice_path: "/mgtv/notice/:type"
+    win_notice_url: "http://wy.mgtv.com/mgtv/notice/win?c=%%SETTLE_PRICE%%"
+    click_notice_url: "http://wy.mgtv.com/mgtv/notice/click?c=%%SETTLE_PRICE%%"
+    key: "975dfad4e0b94c38"
+    RedirectHost: "localhost:7788"

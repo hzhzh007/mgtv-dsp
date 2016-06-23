@@ -1,3 +1,4 @@
+//some input/output stream operation
 package adxmgtv
 
 import (
@@ -11,7 +12,7 @@ import (
 	"net/http"
 )
 
-//TODO: here only response one ad, update 2016160621,fix it
+//TODO: here only response one ad, update 2016160621
 func ResponseAd(ctx context.Context, w http.ResponseWriter, bidRequest *BidRequest, candidateAds logic.Activities) {
 	clog := ctx.Value(ContextLogKey).(*clog.ServerContext)
 	candidateAd := &candidateAds[0]
@@ -20,9 +21,9 @@ func ResponseAd(ctx context.Context, w http.ResponseWriter, bidRequest *BidReque
 		AdUrl:           candidateAd.CreativeUrl(),
 		ClickThroughUrl: candidateAd.LandingPageUrl(),
 
-		IUrl: bidRequest.ImpressionUrl(ctx, candidateAd),
+		IUrl: bidRequest.ImpressionUrl(ctx, candidateAd, 0),
 
-		CUrl:     bidRequest.ClickUrl(ctx, candidateAd),
+		CUrl:     bidRequest.ClickUrl(ctx, candidateAd, 0),
 		AdId:     candidateAd.ActiveId(),
 		Title:    "test", //TODO
 		Duration: candidateAd.Duration(),

@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	Init("127.0.0.1:8989", 10, time.Millisecond*100)
+	Init("127.0.0.1:7779", 10, time.Millisecond*100)
 }
 
 func Test_Request(t *testing.T) {

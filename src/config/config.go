@@ -7,20 +7,6 @@ import (
 	//"time"
 )
 
-func LoadAndSet(configFile string) (config *DspConfig, err error) {
-	cfg := new(DspConfig)
-	err = LoadConfig(configFile, cfg)
-	if err != nil {
-		return cfg, err
-	}
-	cfgFile = configFile
-	return cfg, err
-}
-
-func GetConfig() *DspConfig {
-	return cfg
-}
-
 func Reload() {
 	c := new(DspConfig)
 	err := LoadConfig(cfgFile, c)

@@ -5,8 +5,6 @@ import (
 	"log"
 	"time"
 
-	//	pb "mgtv-dsp/tag_mgtv"
-
 	clog "github.com/hzhzh007/context_log"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
@@ -78,23 +76,3 @@ func RequestTag(ctx context.Context, user User) (*UserTag, error) {
 	}
 	return nil, errors.New("should not run to here")
 }
-
-/*
-func main() {
-	log.SetOutput(os.Stdout)
-
-	conn, err := grpc.Dial(address, grpc.WithInsecure())
-	if err != nil {
-		log.Fatalf("did not connect: %v", err)
-	}
-	defer conn.Close()
-
-	var user pb.User
-	for i := 0; i < 20; i++ {
-		start := time.Now()
-		r, err := c.GetUserTags(context.Background(), &user)
-		log.Printf("call ret ok!  %v, %+v, %s\n", err, r, time.Now().Sub(start))
-		_ = r
-	}
-}
-*/

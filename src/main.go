@@ -5,7 +5,7 @@ import (
 	"config"
 	"flag"
 	"github.com/guregu/kami"
-	cl "github.com/hzhzh007/context_log"
+	clog "github.com/hzhzh007/context_log"
 	"golang.org/x/net/context"
 	"iplib"
 	_ "net/http/pprof"
@@ -24,12 +24,12 @@ func main() {
 	//config
 	config, err := config.LoadAndSet(configFile)
 	if err != nil {
-		cl.Log.Panic("config parse error", err)
+		clog.Log.Panic("config parse error", err)
 	}
 
 	//log
-	cl.InitLog(config.GetLogPath, config.GetLogLevel)
-	cl.Log.Debug("config: %+v", config)
+	clog.InitLog(config.GetLogPath, config.GetLogLevel)
+	clog.Log.Debug("config: %+v", config)
 
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, ConfKey, config)
@@ -41,7 +41,7 @@ func main() {
 	//iplib
 	ipLib, err := iplib.Load(config.IpLib)
 	if err != nil {
-		cl.Log.Panic("load ip failed:%s", err)
+		clog.Log.Panic("load ip failed:%s", err)
 	}
 	ctx = context.WithValue(ctx, IPLibKey, ipLib)
 

@@ -7,9 +7,16 @@ import (
 )
 
 type Activity struct {
-	Id              int         `yaml:"id"`
-	ActiveTime      []Schedule  `yaml:"active_time"`
-	Platform        []Platform  `yaml:"platform"`
+	//activity id
+	Id int `yaml:"id"`
+
+	ActiveTime Schedules `yaml:"active_time"`
+
+	//for mgtv the platform type
+	//for the mgtv:`1 PC`  `21 ANDROID_TABLET_H5`  `22 ANDROID_PHONE_H5`  `23 IPAD_H5`  `24 IPHONE_H5`  `31 ANDROID_TABLET_APP`  `32 ANDROID_PHONE_APP`  `33 IPAD_APP`   `34 IPHONE_APP`   `41 XIAOMI_SDK`   `42 BAIDU_SDK`   `100 OTT`  `101 OTT_NEW`
+	//for others, we can have more personalized definitions
+	Platform []Platform `yaml:"platform"`
+
 	IncludeLocation []Location  `yaml:"include_location"`
 	IncludeTag      []Tag       `yaml:"include_tag"`
 	Creative        []Creative  `yaml:"creative"`
@@ -17,6 +24,9 @@ type Activity struct {
 	MonitorUrl      Impressions `yaml:"monitor_url"`
 	LandingPage     string
 	MaxPrice        int `yaml:"max_price"`
+
+	Flow      FlowType      `yaml:"flow"`
+	Frequency FrequencyType `yaml:"frequency"`
 
 	//the flag wen filter
 	filtered          bool
@@ -127,8 +137,23 @@ func (a *Activity) ClickUrl() []string {
 func (a *Activity) ActiveId() string {
 	return strconv.Itoa(a.Id)
 }
+func (a *Activity) CreativeId() string {
+	selectedCreative := a.selectedCreative()
+	return strconv.Itoa(selectedCreative.Id)
+}
+
 func (a *Activity) Duration() int {
 	return a.selectedCreateive.Duration
+}
+
+//TODO: implement it
+func (a *Activity) IsFlowOK(today, total int) bool {
+	for _, flowSetting := range a.Flow {
+		if !flowSetting.UnderFlow(today, total, a.ActiveTime) {
+			return false
+		}
+	}
+	return true
 }
 
 func (a *Activity) CreativeWidth() int {
@@ -141,6 +166,9 @@ func (a *Activity) CreativeHeight() int {
 
 func (a *Activity) CreativeType() int {
 	return a.selectedCreative().Type
+}
+func (a *Activity) CreativeStart() time.Time {
+	return a.ActiveTime[0].Start
 }
 
 //just for log

@@ -7,4 +7,6 @@ const (
 	MysqlKey      = "mysql"
 	IPLibKey      = "ip"
 	ContextLogKey = "cl"
+	ResourceKey   = "rs"
+	FeedbackKey   = "fb"
 )

@@ -2,6 +2,7 @@ package logic
 
 import (
 	. "common/consts"
+	"errors"
 	clog "github.com/hzhzh007/context_log"
 	"golang.org/x/net/context"
 	"sort"
@@ -32,7 +33,7 @@ func (activities Activities) CommonFilter(ctx context.Context, fn func(a *Activi
 		}
 		if filtered, isContinue = fn(&activities[i], i); filtered == true {
 			activities[i].SetFiltered()
-			clog.Debug("%s filtered by %s", activities[i].ActiveId(), filterType)
+			clog.Debug("activity: %s filtered by %s", activities[i].ActiveId(), filterType)
 		}
 		if isContinue == false {
 			break
@@ -90,6 +91,16 @@ func (activities Activities) UserTagFilter(ctx context.Context, userTags Tags) {
 			clog.Debug("%s filtered by tag", activities[i].ActiveId())
 		}
 	}
+}
+
+//TODO: use binary search
+func (activities Activities) GetActivityById(id int) (*Activity, error) {
+	for i := 0; i < len(activities); i++ {
+		if activities[i].Id == id {
+			return &activities[i], nil
+		}
+	}
+	return nil, errors.New("not found activity, id")
 }
 
 func (activities Activities) Sort() {

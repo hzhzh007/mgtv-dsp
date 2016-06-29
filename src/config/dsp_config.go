@@ -34,12 +34,23 @@ type MgtvConfig struct {
 }
 
 type DspConfig struct {
-	HttpServer ServerConfig `yaml:"http_server,flow"`
-	Log        LogConfig    `yaml:"log,flow"`
-	Redis      RedisConfig  `yaml:"redis,flow"`
-	IpLib      string       `yaml:"ip_lib,flow"`
-	Tag        TagConfig    `yaml:"tag"`
-	Mgtv       MgtvConfig   `yaml:"mgtv"`
+	HttpServer ServerConfig  `yaml:"http_server,flow"`
+	Log        LogConfig     `yaml:"log,flow"`
+	Redis      RedisConfig   `yaml:"redis,flow"`
+	IpLib      string        `yaml:"ip_lib,flow"`
+	Tag        TagConfig     `yaml:"tag"`
+	Mgtv       MgtvConfig    `yaml:"mgtv"`
+	Resource   ResouceConfig `yaml:"resource"`
+}
+
+type ResouceConfig struct {
+	Activity struct {
+		Location string
+		Reload   time.Duration
+	}
+	Flow struct {
+		Reload time.Duration
+	}
 }
 
 type TagConfig struct {

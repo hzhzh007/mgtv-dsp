@@ -26,7 +26,16 @@
         - "http://test.click.com/click2"
     monitor_url:
         -   event: 1
-            url: "http://test.click.com/impression1"
+            url: "http://test.click.com/impression1?imei=__IMEI__&ip=__IP__"
         -   event: 2
-            url: "http://test.click.com/impression2"
+            url: "http://test.click.com/impression2?imei=__IMEI__&ip=__IP__"
     max_price: 2100
+    flow:
+        -   type: 1
+            speed: 1
+            num: 86400
+    frequency:
+        -   type: 0
+            num: 2
+        -   type: 1
+            num: 7

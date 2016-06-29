@@ -1,0 +1,20 @@
+// /Users/zzh/Downloads/protobuf-3.0.0-beta-3/src/protoc --go_out=. frequency.proto
+syntax = "proto3";
+package dynamic;
+ enum FreqType {
+    FreqPerDay = 0;
+    FreqPerWeek= 1;
+    FreqPerMonth= 2;
+    FreqCustom= 3;
+  };
+
+message Record{
+  int32 Id = 1;
+  int32 Expire= 2;
+  FreqType Type = 3;
+  int32 Counter= 4;
+};
+
+message RedisValue {
+  repeated Record Impression =1  ;
+};

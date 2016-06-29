@@ -1,25 +1,34 @@
 http_server:
-    listen : "0.0.0.0:7777"
+    listen : "0.0.0.0:7777" #http listen address, all http input on it
     max_conn : 655
 
 log:
-    #    path : "./log/adserver.log"
-    level : "DEBUG"
+    #    path : "./log/adserver.log" #log file path, if null , log to stdout
+    level : "DEBUG" #log level ex:INFO,DEBUG
 
 redis:
     addr : "10.100.2.90:6379"
     pool_num: 2
+
+resource:
+    activity:
+        location: "config/activity.yaml"
+        reload: "155s"
+    flow:
+        reload: "155s"
+
 ip_lib: "data/ip.csv"
 
 tag:
     addr: "127.0.0.1:7779"
+    #addr: "10.100.2.90:8000"
     pool_num: 10
     timeout: "200ms"
 
 mgtv:
     bid_path: "/mgtv/bid"
     notice_path: "/mgtv/notice/:type"
-    win_notice_url: "http://wy.mgtv.com/mgtv/notice/win?c=%%SETTLE_PRICE%%"
-    click_notice_url: "http://wy.mgtv.com/mgtv/notice/click?c=%%SETTLE_PRICE%%"
+    win_notice_url: "http://py.da.mgtv.com/mgtv/notice/win?c=%%SETTLE_PRICE%%&aid=${ACTIVE_ID}&uid=${UID}"
+    click_notice_url: "http://py.da.mgtv.com/mgtv/notice/click?c=%%SETTLE_PRICE%%c=%%SETTLE_PRICE%%&aid=${ACTIVE_ID}&uid=${UID}"
     key: "975dfad4e0b94c38"
     RedirectHost: "localhost:7788"

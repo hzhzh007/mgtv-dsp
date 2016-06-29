@@ -4,12 +4,16 @@ import (
 	. "common/consts"
 	"common/encrypt"
 	"config"
+	"feedback"
 	"fmt"
 	"github.com/guregu/kami"
 	clog "github.com/hzhzh007/context_log"
 	"github.com/mattrobenolt/emptygif"
 	"golang.org/x/net/context"
 	"net/http"
+	"net/url"
+	"strconv"
+	"strings"
 )
 
 const (
@@ -22,6 +26,7 @@ var (
 	WinNoticeUrl     string
 	ClickNoticeUrl   string
 	LocaleRecordHost string
+	Feedback         *feedback.Feedback
 )
 
 //TODO: here can do some other things like flow and frequency controll
@@ -67,17 +72,46 @@ func WinNoticeHandler(ctx context.Context, w http.ResponseWriter, r *http.Reques
 		decrypted, err := encrypt.AesCBCDecrypte(price[0], aesKey)
 		if err != nil {
 			clog.Error("decrypt str:%s error:%s", price[0], err)
-		} else if LocaleRecordHost != "" {
-			http.Get(fmt.Sprintf("http://%s/%s?%s", LocaleRecordHost, r.URL.Path, forms.Encode()))
 		}
 		forms.Add(DecryptedPriceKey, decrypted)
 		clog.AddNotes("", map2String(forms))
 	}
+	if LocaleRecordHost != "" {
+		http.Get(fmt.Sprintf("http://%s/%s?%s", LocaleRecordHost, r.URL.Path, forms.Encode()))
+	}
+	if strings.HasSuffix(r.URL.Path, "win") {
+		select {
+		case Feedback.Input <- feedback.Record{
+			Uid:      formsString(forms, "uid"),
+			Type:     feedback.RecordImpressionType,
+			Activity: formInt(forms, "aid"),
+		}:
+		default:
+			clog.Error("feedback queue full:%s", forms.Encode())
+		}
+	}
 	w.Write(emptygif.PIXEL)
+}
+
+func formsString(form url.Values, key string) string {
+	v := form[key]
+	if len(v) > 0 {
+		return v[0]
+	}
+	return ""
+}
+func formInt(form url.Values, key string) int {
+	v := form[key]
+	if len(v) > 0 {
+		vi, _ := strconv.Atoi(v[0])
+		return vi
+	}
+	return 0
 }
 
 func InitHandler(ctx context.Context) {
 	conf := ctx.Value(ConfKey).(*config.DspConfig)
+	Feedback = ctx.Value(FeedbackKey).(*feedback.Feedback)
 
 	//some local variables init
 	aesKey = conf.Mgtv.Key

@@ -18,11 +18,11 @@ var (
 // only one can get lock at X seconds
 // use redis and the cmd `SET KEY VALUE NX  EX time` as the distribute lock
 // here set the key to Now() to make debug more easy
-func OnceInXSecond(redisPool redis.Conn, key string, second int) (bool, error) {
+func OnceInXSecond(redisConn redis.Conn, key string, second int) (bool, error) {
 	if key == "" {
 		return false, ErrorEmptyKey
 	}
-	OK, err := redis.String(redisPool.Do("SET", key, time.Now().Unix(), "NX", "EX", second))
+	OK, err := redis.String(redisConn.Do("SET", key, time.Now().Unix(), "NX", "EX", second))
 	if err == redis.ErrNil {
 		err = nil
 	}

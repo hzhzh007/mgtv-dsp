@@ -3,6 +3,7 @@ package main
 import (
 	. "common/consts"
 	"config"
+	"feedback"
 	"flag"
 	"github.com/guregu/kami"
 	clog "github.com/hzhzh007/context_log"
@@ -10,6 +11,7 @@ import (
 	"iplib"
 	_ "net/http/pprof"
 	"redis"
+	"resource"
 	"tag"
 )
 
@@ -24,7 +26,7 @@ func main() {
 	//config
 	config, err := config.LoadAndSet(configFile)
 	if err != nil {
-		clog.Log.Panic("config parse error", err)
+		clog.Log.Fatalf("config parse error", err)
 	}
 
 	//log
@@ -41,16 +43,26 @@ func main() {
 	//iplib
 	ipLib, err := iplib.Load(config.IpLib)
 	if err != nil {
-		clog.Log.Panic("load ip failed:%s", err)
+		clog.Log.Fatalf("load ip failed:%s", err)
 	}
 	ctx = context.WithValue(ctx, IPLibKey, ipLib)
 
+	//activities
+	res, err := resource.NewResource(ctx)
+	if err != nil {
+		clog.Log.Fatalf("load resource error:%s", err)
+	}
+	ctx = context.WithValue(ctx, ResourceKey, res)
+
+	//feedback
+	feedback, err := feedback.NewFeedback(ctx, 10000, 10)
+	if err != nil {
+		clog.Log.Fatalf("feedback init err:%s", err)
+	}
+	ctx = context.WithValue(ctx, FeedbackKey, feedback)
+
 	//tag init
 	tag.Init(config.Tag.Addr, config.Tag.PoolNum, config.Tag.Timeout)
-
-	//	mysql_conn, _ := db_mysql.Open(config.Mysql.Addr)
-	//TODO check error
-	//ctx = context.WithValue(ctx, MysqlKey, mysql_conn)
 
 	kami.Context = ctx
 	initHandler(ctx)

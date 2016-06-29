@@ -4,6 +4,8 @@ import (
 	"time"
 )
 
+type Schedules []Schedule
+
 type Schedule struct {
 	Start time.Time
 	End   time.Time

@@ -25,6 +25,9 @@ func LoadConfig(configFile string, config interface{}) (err error) {
 	if err != nil {
 		return
 	}
-	err = yaml.Unmarshal(data, config)
-	return
+	return LoadConfigFromBytes(data, config)
+}
+
+func LoadConfigFromBytes(data []byte, config interface{}) error {
+	return yaml.Unmarshal(data, config)
 }

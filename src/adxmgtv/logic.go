@@ -7,6 +7,7 @@ import (
 	clog "github.com/hzhzh007/context_log"
 	"golang.org/x/net/context"
 	"logic"
+	"resource"
 	"tag"
 	"time"
 )
@@ -14,7 +15,8 @@ import (
 //TODO: implement it
 func filterAd(ctx context.Context, request *BidRequest) (*logic.Activities, error) {
 	clog := ctx.Value(ContextLogKey).(*clog.ServerContext)
-	candidateAds, err := bridge.GetActivitiesCopy(request)
+	resource := ctx.Value(ResourceKey).(*resource.Resource)
+	candidateAds, err := resource.GetActivitiesCopy(request, true)
 	if err != nil {
 		clog.Error("get candidateAds error:%s", err)
 		return candidateAds, err
@@ -52,6 +54,9 @@ func filterAd(ctx context.Context, request *BidRequest) (*logic.Activities, erro
 	localTags := bridge.RpcUserTag2LogicTag(userTags)
 	clog.AddNotes("tags", fmt.Sprintf("%v", localTags))
 	candidateAds.UserTagFilter(ctx, localTags)
+
+	//frequncyFilter
+	candidateAds.CommonFilter(ctx, request.FrequencyFilterFn(ctx), "freq")
 
 	//first sort
 	clog.StartTimer()

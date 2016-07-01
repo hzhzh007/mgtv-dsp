@@ -12,15 +12,13 @@ import (
 
 //for the mgtv, the same user one visitor will cause multiple rtb request ,so we need to removal duplicate return
 //return func(a *Activity, index int) (filterd , isContinue bool)
-func (b *BidRequest) DuplicateRemovalFn(ctx context.Context) func(a *logic.Activity, index int) (filterd bool, isContinue bool) {
+func (b *BidRequest) DuplicateRemovalFn(ctx context.Context, redisConn redis.Conn) func(a *logic.Activity, index int) (filterd bool, isContinue bool) {
 	var keyPrefix string
 	hasFirstAd := false
-	redisPool := ctx.Value(RedisKey).(*redis.Pool)
-	redisConn := redisPool.Get()
 	clog := ctx.Value(ContextLogKey).(*clog.ServerContext)
 	uids, _ := b.GetUids()
 	if len(uids) == 0 {
-		keyPrefix = ""
+		keyPrefix = "lock"
 	} else {
 		//keyPrefix = fmt.Sprintf("%s_%d", uids[0].Value, rand.Intn(5000))
 		keyPrefix = uids[0].Value
@@ -49,11 +47,9 @@ func (b *BidRequest) DuplicateRemovalFn(ctx context.Context) func(a *logic.Activ
 	return fn
 }
 
-func (b *BidRequest) FrequencyFilterFn(ctx context.Context) func(a *logic.Activity, index int) (filterd bool, isContinue bool) {
+func (b *BidRequest) FrequencyFilterFn(ctx context.Context, redisConn redis.Conn) func(a *logic.Activity, index int) (filterd bool, isContinue bool) {
 	key := ""
 	uids, _ := b.GetUids()
-	redisPool := ctx.Value(RedisKey).(*redis.Pool)
-	redisConn := redisPool.Get()
 	if len(uids) > 0 {
 		key = uids[0].Value
 	}
@@ -62,7 +58,10 @@ func (b *BidRequest) FrequencyFilterFn(ctx context.Context) func(a *logic.Activi
 	freq, err := dynamic.GetFreqByUid(redisConn, key)
 	clog.StopTimer("freq_cost")
 	if err != nil {
-		clog.Error("get freq error", err)
+		if err == dynamic.ErrorEmptyKey {
+		} else {
+			clog.Error("get freq error", err)
+		}
 	}
 	fn := func(a *logic.Activity, index int) (filtered bool, isContinue bool) {
 		filtered = false

@@ -4,6 +4,7 @@ import (
 	"common/bridge"
 	. "common/consts"
 	"fmt"
+	"github.com/garyburd/redigo/redis"
 	clog "github.com/hzhzh007/context_log"
 	"golang.org/x/net/context"
 	"logic"
@@ -16,6 +17,9 @@ import (
 func filterAd(ctx context.Context, request *BidRequest) (*logic.Activities, error) {
 	clog := ctx.Value(ContextLogKey).(*clog.ServerContext)
 	resource := ctx.Value(ResourceKey).(*resource.Resource)
+	redisPool := ctx.Value(RedisKey).(*redis.Pool)
+	redisConn := redisPool.Get()
+	defer redisConn.Close()
 	candidateAds, err := resource.GetActivitiesCopy(request, true)
 	if err != nil {
 		clog.Error("get candidateAds error:%s", err)
@@ -56,7 +60,7 @@ func filterAd(ctx context.Context, request *BidRequest) (*logic.Activities, erro
 	candidateAds.UserTagFilter(ctx, localTags)
 
 	//frequncyFilter
-	candidateAds.CommonFilter(ctx, request.FrequencyFilterFn(ctx), "freq")
+	candidateAds.CommonFilter(ctx, request.FrequencyFilterFn(ctx, redisConn), "freq")
 
 	//first sort
 	clog.StartTimer()
@@ -64,7 +68,7 @@ func filterAd(ctx context.Context, request *BidRequest) (*logic.Activities, erro
 	clog.StopTimer("sort1_cost")
 
 	//duplicate removal
-	candidateAds.CommonFilter(ctx, request.DuplicateRemovalFn(ctx), "mgtv reduplicate")
+	candidateAds.CommonFilter(ctx, request.DuplicateRemovalFn(ctx, redisConn), "mgtv reduplicate")
 
 	candidateAds.Sort()
 

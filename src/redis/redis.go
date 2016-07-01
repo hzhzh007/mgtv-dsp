@@ -26,7 +26,9 @@ func Close(ctx context.Context, key string) context.Context {
 func NewPool(addr string, pool_num int) *rlib.Pool {
 	return &rlib.Pool{
 		MaxIdle:     pool_num,
-		IdleTimeout: 240 * time.Second,
+		MaxActive:   pool_num,
+		IdleTimeout: 40 * time.Second,
+		Wait:        true,
 		Dial: func() (rlib.Conn, error) {
 			c, err := rlib.Dial("tcp", fmt.Sprintf(addr))
 			if err != nil {
@@ -36,9 +38,10 @@ func NewPool(addr string, pool_num int) *rlib.Pool {
 			return c, err
 		},
 		TestOnBorrow: func(c rlib.Conn, t time.Time) error {
-			_, err := c.Do("PING")
-			log.Println("redis server connection error:", err)
-			return err
+			//			_, err := c.Do("PING")
+			//			log.Println("redis server connection error:", err)
+			//			return err
+			return nil
 		},
 	}
 }

@@ -19,7 +19,7 @@ type FreqValue struct {
 }
 
 var (
-	ErrorEmptyKey = errors.New("empty key and return locked")
+	ErrorEmptyKey = errors.New("empty key and return null")
 )
 
 func NewFreqFromRedis(redisConn redis.Conn, key string) (*FreqValue, error) {

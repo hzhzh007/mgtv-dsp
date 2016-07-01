@@ -31,6 +31,7 @@ func main() {
 
 	//log
 	clog.InitLog(config.GetLogPath, config.GetLogLevel)
+	clog.InitSignal(func() {})
 	clog.Log.Debug("config: %+v", config)
 
 	ctx := context.Background()

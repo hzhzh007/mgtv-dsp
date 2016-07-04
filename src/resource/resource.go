@@ -81,8 +81,9 @@ func (r *Resource) FilterByFlow(activities *logic.Activities) error {
 
 func (r *Resource) LoadFlow() error {
 	redisPool := r.ctx.Value(RedisKey).(*redis.Pool)
-	redisConn := redisPool.Get()
 	ids := activitiesIds(r.activity)
+	redisConn := redisPool.Get()
+	defer redisConn.Close()
 	flow, err := dynamic.GetActivityFlowData(redisConn, ids, dynamic.FlowImpressionType)
 	if err != nil {
 		return err

@@ -25,3 +25,13 @@ func Test_TimeUnder(t *testing.T) {
 	assert.False(schedule.UnderSchedule(time0501))
 
 }
+
+func Test_TotalDuration(t *testing.T) {
+	assert := assert.New(t)
+	schedule := Schedule{}
+	schedule.Start, _ = time.Parse("2006-01-02", "2016-06-15")
+	schedule.End, _ = time.Parse("2006-01-02", "2016-06-20")
+	schedules := Schedules{schedule}
+	totalDuration := schedules.TotalDuration()
+	assert.Equal(24*time.Hour*5, totalDuration)
+}

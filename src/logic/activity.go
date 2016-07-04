@@ -23,7 +23,8 @@ type Activity struct {
 	Click           []string    `yaml:"click_url"`
 	MonitorUrl      Impressions `yaml:"monitor_url"`
 	LandingPage     string
-	MaxPrice        int `yaml:"max_price"`
+	MaxPrice        int   `yaml:"max_price"`
+	Pmp             []PMP `yaml:"pmp"`
 
 	Flow      FlowType      `yaml:"flow"`
 	Frequency FrequencyType `yaml:"frequency"`
@@ -31,6 +32,7 @@ type Activity struct {
 	//the flag wen filter
 	filtered          bool
 	selectedCreateive *Creative
+	selectedDeal      *PMP
 	//the below is the extention as the dsp developed
 	//ExcludeLocations []Location   `yaml:"exclude_location"`
 	//ExcludeTag  []Tag        `yaml:"exclude_tag"`
@@ -149,7 +151,7 @@ func (a *Activity) Duration() int {
 //TODO: implement it
 func (a *Activity) IsFlowOK(today, total int) bool {
 	for _, flowSetting := range a.Flow {
-		if !flowSetting.UnderFlow(today, total, a.ActiveTime) {
+		if !flowSetting.UnderFlow(today, total, a.ActiveTime, time.Now()) {
 			return false
 		}
 	}

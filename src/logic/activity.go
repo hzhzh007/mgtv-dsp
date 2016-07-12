@@ -22,9 +22,9 @@ type Activity struct {
 	Creative        []Creative  `yaml:"creative"`
 	Click           []string    `yaml:"click_url"`
 	MonitorUrl      Impressions `yaml:"monitor_url"`
-	LandingPage     string
-	MaxPrice        int   `yaml:"max_price"`
-	Pmp             []PMP `yaml:"pmp"`
+	LandingPage     string      `yaml:"landing_page"`
+	MaxPrice        int         `yaml:"max_price"`
+	Pmp             []PMP       `yaml:"pmp"`
 
 	Flow      FlowType      `yaml:"flow"`
 	Frequency FrequencyType `yaml:"frequency"`
@@ -92,6 +92,9 @@ func (a *Activity) Price() int {
 	return a.MaxPrice
 }
 func (a *Activity) PlatformOK(requestPlatform Platform) bool {
+	if len(a.Platform) == 0 {
+		return true
+	}
 	for _, platform := range a.Platform {
 		if platform == requestPlatform {
 			return true
@@ -106,6 +109,16 @@ func (a *Activity) selectedCreative() *Creative {
 		a.selectedCreateive = &a.Creative[0]
 	}
 	return a.selectedCreateive
+}
+
+func (a *Activity) SetDeal(i int) {
+	a.selectedDeal = &a.Pmp[i]
+}
+func (a *Activity) SelectedDealId() string {
+	if a.selectedDeal == nil {
+		return ""
+	}
+	return a.selectedDeal.DealId
 }
 
 func (a *Activity) CreativeUrl() string {
@@ -175,5 +188,5 @@ func (a *Activity) CreativeStart() time.Time {
 
 //just for log
 func (a *Activity) String(msg string) string {
-	return fmt.Sprintf("{activity:%d,creative:%d,%s}", a.Id, a.selectedCreative().Id, msg)
+	return fmt.Sprintf("{activity:%d,creative:%d,pd:%s,%s}", a.Id, a.selectedCreative().Id, a.SelectedDealId(), msg)
 }

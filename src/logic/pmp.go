@@ -1,7 +1,7 @@
 package logic
 
 type PMP struct {
-	DealId string
+	DealId string `yaml:"deal_id"`
 }
 
 func (p *PMP) Match(dealId string) bool {

@@ -73,7 +73,7 @@ func (f *FlowResult) GetDataToday(redisConn redis.Conn, ids []int, flowType stri
 		} else if err != nil {
 			clog.Log.Error("get flow from redis error:%s", err)
 		} else {
-			f.totalFlow[id] = flow
+			f.todayFlow[id] = flow
 		}
 	}
 	return nil
@@ -88,10 +88,10 @@ func KeyToday(id int, flowType, today string) string {
 }
 
 func IncrActivityFlow(redisConn redis.Conn, id int, flowType string) error {
-	_, err := redis.Int(redisConn.Do("INCR", KeyTotal(id, flowType), 1))
+	_, err := redis.Int(redisConn.Do("INCR", KeyTotal(id, flowType)))
 	if err != nil {
 		return err
 	}
-	_, err = redis.Int(redisConn.Do("INCR", KeyToday(id, flowType, time.Now().Format("20060102")), 1))
+	_, err = redis.Int(redisConn.Do("INCR", KeyToday(id, flowType, time.Now().Format("20060102"))))
 	return err
 }

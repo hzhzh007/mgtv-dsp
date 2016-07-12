@@ -31,13 +31,17 @@ func init() {
 
 type BidRequest struct {
 	proto.Request
+	city int
 }
 
 //TODO: here iplib do not handle err
 func (b *BidRequest) GetLocation(ctx context.Context) (logic.Location, error) {
+	clog := ctx.Value(ContextLogKey).(*clog.ServerContext)
 	iplib := ctx.Value(IPLibKey).(iplib.IpCollections)
 	ipStr := b.Device.Ip
 	city := iplib.Ip2CityCode(ipStr)
+	b.city = int(city)
+	clog.AddNotes("city", strconv.Itoa(int(city)))
 	return logic.Location(city), nil
 }
 
@@ -84,7 +88,7 @@ func parseInput(ctx context.Context, r *http.Request) (*BidRequest, error) {
 	if err != nil {
 	}
 	return &BidRequest{
-		pmpRequest,
+		Request: pmpRequest,
 	}, nil
 }
 
@@ -109,6 +113,9 @@ func (b *BidRequest) ClickUrl(ctx context.Context, candidateAd *logic.Activity, 
 	clickUrl := candidateAd.ClickUrl()
 	replacer := b.CreateReplacer(candidateAd, index)
 	result := make([]string, 0, len(clickUrl))
+
+	//self monitor
+	result = append(result, replacer.Replace(ClickNoticeUrl))
 	for _, url := range clickUrl {
 		result = append(result, replacer.Replace(url))
 	}
@@ -128,6 +135,8 @@ func (b *BidRequest) CreateReplacer(activity *logic.Activity, index int) *string
 		"${ACTIVE_ID}", activity.ActiveId(),
 		"${CONTENT_ID}", strconv.Itoa(b.Video.VideoId),
 		"${UID}", uid,
+		"${PD}", activity.SelectedDealId(),
+		"${CITY}", strconv.Itoa(b.city),
 		"__OS__", b.Device.Os,
 		"__IMEI__", b.Device.Imei,
 		"__MAC__", b.Device.Mac,

@@ -74,8 +74,9 @@ func WinNoticeHandler(ctx context.Context, w http.ResponseWriter, r *http.Reques
 			clog.Error("decrypt str:%s error:%s", price[0], err)
 		}
 		forms.Add(DecryptedPriceKey, decrypted)
-		clog.AddNotes("", map2String(forms))
 	}
+	clog.AddNotes("", map2String(forms))
+	clog.Debug("redirect: %s", fmt.Sprintf("http://%s/%s?%s", LocaleRecordHost, r.URL.Path, forms.Encode()))
 	if LocaleRecordHost != "" {
 		http.Get(fmt.Sprintf("http://%s/%s?%s", LocaleRecordHost, r.URL.Path, forms.Encode()))
 	}

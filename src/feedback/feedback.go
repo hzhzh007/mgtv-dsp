@@ -99,6 +99,7 @@ func (f *Feedback) Worker() {
 		activity, err := f.GetActivityById(record.Activity)
 		if err != nil {
 			clog.Log.Error("get activity by id err:%s", err)
+			redisConn.Close()
 			continue
 		}
 
@@ -108,6 +109,10 @@ func (f *Feedback) Worker() {
 				clog.Log.Error("inc freq error:%s", err)
 			}
 		}
-		dynamic.IncrActivityFlow(redisConn, activity.Id, dynamic.FlowImpressionType)
+		err = dynamic.IncrActivityFlow(redisConn, activity.Id, dynamic.FlowImpressionType)
+		if err != nil {
+			clog.Log.Error("inc flow error:%s", err)
+		}
+		redisConn.Close()
 	}
 }

@@ -7,7 +7,7 @@ type Creative struct {
 	Width       int
 	Type        int
 	Duration    int
-	LandingPage string
+	LandingPage string      `yaml:"landing_page"`
 	Click       []string    `yaml:"click_url"`
 	MonitorUrl  Impressions `yaml:"monitor_url"`
 }

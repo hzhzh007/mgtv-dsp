@@ -30,6 +30,7 @@ func ResponseAd(ctx context.Context, w http.ResponseWriter, bidRequest *BidReque
 		Ctype:    proto.AdTypeVideo, //TODO: CreativeType()
 		Width:    candidateAd.CreativeWidth(),
 		Height:   candidateAd.CreativeHeight(),
+		DealId:   candidateAd.SelectedDealId(),
 	}
 	reqsponse := proto.Response{
 		ErrCode: proto.ResponseBidOK,

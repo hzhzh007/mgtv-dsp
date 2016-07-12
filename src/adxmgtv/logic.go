@@ -29,10 +29,13 @@ func filterAd(ctx context.Context, request *BidRequest) (*logic.Activities, erro
 	//log some info
 	request.LogInfo(ctx, candidateAds)
 
-	clog.StartTimer()
 	/*
 	 *some filte logic
 	 */
+
+	//pd, prefer deal
+	candidateAds.CommonFilter(ctx, request.PDFilterFn(ctx), "pd")
+
 	//location filter
 	location, _ := request.GetLocation(ctx)
 	candidateAds.LocationFilter(ctx, location)
@@ -43,7 +46,6 @@ func filterAd(ctx context.Context, request *BidRequest) (*logic.Activities, erro
 	//platform filter
 	platform, _ := request.GetPlatform(ctx)
 	candidateAds.PlatformFilter(ctx, platform)
-	clog.StopTimer("filter1_cost")
 
 	//tag filter
 	uids, _ := request.GetUids()
@@ -63,9 +65,7 @@ func filterAd(ctx context.Context, request *BidRequest) (*logic.Activities, erro
 	candidateAds.CommonFilter(ctx, request.FrequencyFilterFn(ctx, redisConn), "freq")
 
 	//first sort
-	clog.StartTimer()
 	candidateAds.Sort()
-	clog.StopTimer("sort1_cost")
 
 	//duplicate removal
 	candidateAds.CommonFilter(ctx, request.DuplicateRemovalFn(ctx, redisConn), "mgtv reduplicate")

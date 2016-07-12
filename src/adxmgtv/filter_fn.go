@@ -76,3 +76,36 @@ func (b *BidRequest) FrequencyFilterFn(ctx context.Context, redisConn redis.Conn
 	}
 	return fn
 }
+
+func (b *BidRequest) PDFilterFn(ctx context.Context) func(a *logic.Activity, index int) (filterd bool, isContinue bool) {
+	clog := ctx.Value(ContextLogKey).(*clog.ServerContext)
+	fn := func(a *logic.Activity, index int) (filtered bool, isContinue bool) {
+		filtered = true
+		isContinue = true
+		if len(b.Imp) == 0 {
+			return false, true
+		}
+		if len(b.Imp[0].Pmp.Deals) == 0 {
+			if len(a.Pmp) == 0 {
+				return false, true
+			} else {
+				return true, true
+			}
+		} else {
+			if len(a.Pmp) == 0 {
+				return true, true
+			}
+		}
+		for _, deal := range b.Imp[0].Pmp.Deals {
+			for i, pmp := range a.Pmp {
+				if pmp.Match(deal.Id) && deal.Price <= a.Price() {
+					a.SetDeal(i)
+					clog.Debug("select pd:%s", pmp.DealId)
+					return false, true
+				}
+			}
+		}
+		return
+	}
+	return fn
+}

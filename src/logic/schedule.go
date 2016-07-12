@@ -22,6 +22,7 @@ func (ses Schedules) TotalDuration() time.Duration {
 	}
 	return d
 }
+
 func (ses Schedules) PassedDuration(now time.Time) time.Duration {
 	var d time.Duration = 0
 	for i := 0; i < len(ses); i++ {
@@ -29,9 +30,6 @@ func (ses Schedules) PassedDuration(now time.Time) time.Duration {
 			d += ses[i].End.Sub(ses[i].Start)
 		} else if now.After(ses[i].Start) {
 			d += now.Sub(ses[i].Start)
-			break
-		} else {
-			break
 		}
 	}
 	return d

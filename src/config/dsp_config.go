@@ -9,11 +9,6 @@ var (
 	cfgFile string
 )
 
-type ServerConfig struct {
-	Listen  string
-	MaxConn int `yaml:"max_conn,flow"`
-}
-
 type LogConfig struct {
 	Path  string
 	Level string
@@ -30,17 +25,16 @@ type MgtvConfig struct {
 	WinNoticeUrl    string `yaml:"win_notice_url"` //"http://wy.mgtv.com/winnotice?c=%%SETTLE_PRICE%%"
 	ClickNonticeUrl string `yaml:"click_notice_url"`
 	Key             string `yaml:"key"`
-	RedirectHost    string `yaml:"redirect_host`
+	RedirectHost    string `yaml:"redirect_host"`
 }
 
 type DspConfig struct {
-	HttpServer ServerConfig  `yaml:"http_server,flow"`
-	Log        LogConfig     `yaml:"log,flow"`
-	Redis      RedisConfig   `yaml:"redis,flow"`
-	IpLib      string        `yaml:"ip_lib,flow"`
-	Tag        TagConfig     `yaml:"tag"`
-	Mgtv       MgtvConfig    `yaml:"mgtv"`
-	Resource   ResouceConfig `yaml:"resource"`
+	Log      LogConfig     `yaml:"log,flow"`
+	Redis    RedisConfig   `yaml:"redis,flow"`
+	IpLib    string        `yaml:"ip_lib,flow"`
+	Tag      TagConfig     `yaml:"tag"`
+	Mgtv     MgtvConfig    `yaml:"mgtv"`
+	Resource ResouceConfig `yaml:"resource"`
 }
 
 type ResouceConfig struct {

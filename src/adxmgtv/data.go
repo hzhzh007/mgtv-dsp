@@ -45,6 +45,17 @@ func (b *BidRequest) GetLocation(ctx context.Context) (logic.Location, error) {
 	return logic.Location(city), nil
 }
 
+func (b *BidRequest) VideoDuration(ctx context.Context) int {
+	return b.Video.Duration
+}
+
+func (b *BidRequest) AdType(ctx context.Context) int {
+	if len(b.Imp) > 0 {
+		return b.Imp[0].Location
+	}
+	return 0
+}
+
 //here we use the mgtv platform type, so we do not need to translate it
 func (b *BidRequest) GetPlatform(ctx context.Context) (logic.Platform, error) {
 	return logic.Platform(b.Device.Type), nil
@@ -54,7 +65,7 @@ func (b *BidRequest) LogInfo(ctx context.Context, candidateAds *logic.Activities
 	clog := ctx.Value(ContextLogKey).(*clog.ServerContext)
 	clog.AddNotes("bid", b.Bid)
 	if len(b.Imp) > 0 {
-		clog.AddNotes("slot", strconv.Itoa(b.Imp[0].SpaceId))
+		clog.AddNotes("slot", b.Imp[0].SpaceId)
 		clog.AddNotes("player", strconv.Itoa(b.Imp[0].PlayerId))
 		clog.AddNotes("location", strconv.Itoa(b.Imp[0].Location))
 		clog.AddNotes("order", strconv.Itoa(b.Imp[0].Order))
@@ -85,11 +96,9 @@ func parseInput(ctx context.Context, r *http.Request) (*BidRequest, error) {
 	}
 
 	err = json.Unmarshal(body, &pmpRequest)
-	if err != nil {
-	}
 	return &BidRequest{
 		Request: pmpRequest,
-	}, nil
+	}, err
 }
 
 //TODO: add self win notice and macro replacement
@@ -128,7 +137,7 @@ func (b *BidRequest) CreateReplacer(activity *logic.Activity, index int) *string
 	if len(uids) > 0 {
 		uid = uids[0].Value
 	}
-	replacer := strings.NewReplacer("${ADSPACE_ID}", strconv.Itoa(b.Imp[index].SpaceId),
+	replacer := strings.NewReplacer("${ADSPACE_ID}", b.Imp[index].SpaceId,
 		"${ORDER}", strconv.Itoa(b.Imp[index].Order),
 		"${PLAYER_ID}", strconv.Itoa(b.Imp[index].PlayerId),
 		"${CREATIVE_ID}", activity.CreativeId(),

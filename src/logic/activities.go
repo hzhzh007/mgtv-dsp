@@ -93,6 +93,32 @@ func (activities Activities) UserTagFilter(ctx context.Context, userTags Tags) {
 	}
 }
 
+func (activities Activities) DurationFilter(ctx context.Context, duration int) {
+	clog := ctx.Value(ContextLogKey).(*clog.ServerContext)
+	for i := 0; i < len(activities); i++ {
+		if activities[i].Filtered() {
+			continue
+		}
+		if !activities[i].Length.UnderDuration(duration) {
+			activities[i].SetFiltered()
+			clog.Debug("%s filtered by duration", activities[i].ActiveId())
+		}
+	}
+}
+
+func (activities Activities) AdTypeFilter(ctx context.Context, adType int) {
+	clog := ctx.Value(ContextLogKey).(*clog.ServerContext)
+	for i := 0; i < len(activities); i++ {
+		if activities[i].Filtered() {
+			continue
+		}
+		if !(activities[i].AdType == adType) {
+			activities[i].SetFiltered()
+			clog.Debug("%s filtered by adtype a:%d, r:%d", activities[i].ActiveId(), activities[i].AdType, adType)
+		}
+	}
+}
+
 //TODO: use binary search
 func (activities Activities) GetActivityById(id int) (*Activity, error) {
 	for i := 0; i < len(activities); i++ {

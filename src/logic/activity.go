@@ -15,10 +15,12 @@ type Activity struct {
 	//for mgtv the platform type
 	//for the mgtv:`1 PC`  `21 ANDROID_TABLET_H5`  `22 ANDROID_PHONE_H5`  `23 IPAD_H5`  `24 IPHONE_H5`  `31 ANDROID_TABLET_APP`  `32 ANDROID_PHONE_APP`  `33 IPAD_APP`   `34 IPHONE_APP`   `41 XIAOMI_SDK`   `42 BAIDU_SDK`   `100 OTT`  `101 OTT_NEW`
 	//for others, we can have more personalized definitions
-	Platform []Platform `yaml:"platform"`
-
+	Platform        []Platform  `yaml:"platform"`
+	AdType          int         `yaml:"ad_type"`
 	IncludeLocation []Location  `yaml:"include_location"`
 	IncludeTag      []Tag       `yaml:"include_tag"`
+	ExcludeTag      []Tag       `yaml:"exclude_tag"`
+	Length          Duration    `yaml:"length"`
 	Creative        []Creative  `yaml:"creative"`
 	Click           []string    `yaml:"click_url"`
 	MonitorUrl      Impressions `yaml:"monitor_url"`
@@ -35,7 +37,6 @@ type Activity struct {
 	selectedDeal      *PMP
 	//the below is the extention as the dsp developed
 	//ExcludeLocations []Location   `yaml:"exclude_location"`
-	//ExcludeTag  []Tag        `yaml:"exclude_tag"`
 }
 
 func (a *Activity) LocationOK(requestLocation Location) bool {
@@ -61,16 +62,30 @@ func (a *Activity) ScheduleOK(requestTime time.Time) bool {
 	}
 	return false
 }
+
+//inlcude priority higher than exclude priority
 func (a *Activity) TagOK(userTag []Tag) bool {
-	if len(a.IncludeTag) == 0 {
+	lenIncludeTag := len(a.IncludeTag)
+	lenExcludeTag := len(a.ExcludeTag)
+	if lenIncludeTag == 0 && lenExcludeTag == 0 {
 		return true
 	}
+	//include stratage priority is higher
 	for _, tag := range a.IncludeTag {
-		if tag.In(userTag) {
-			return true
+		if !tag.In(userTag) {
+			return false
 		}
 	}
-	return false
+	if lenIncludeTag > 0 {
+		return true
+	}
+
+	for _, tag := range a.ExcludeTag {
+		if tag.In(userTag) {
+			return false
+		}
+	}
+	return true
 }
 
 func (a *Activity) Filtered() bool {

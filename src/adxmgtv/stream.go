@@ -46,10 +46,14 @@ func ResponseEmpty(ctx context.Context, bidRequest *BidRequest, w http.ResponseW
 	reqsponse := proto.Response{
 		ErrCode: proto.ResponseNoAd,
 		Version: ProtocolVersion,
+		Ads:     make([]proto.ADS, 0),
 	}
 
 	if bidRequest != nil {
 		reqsponse.Bid = bidRequest.Bid
+	} else {
+		clog := ctx.Value(ContextLogKey).(*clog.ServerContext)
+		clog.Error("request is nil")
 	}
 	WriteResponse(ctx, w, reqsponse, 200)
 	return nil

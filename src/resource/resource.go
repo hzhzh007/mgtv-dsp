@@ -118,6 +118,7 @@ func (r *Resource) Update() {
 				continue
 			}
 			r.activity = activities
+			clog.Log.Debug("activity:%+v", r.activity)
 			clog.Log.Notice("update actifity  and costs:%s", time.Now().Sub(start))
 
 		case <-flowTimer.C:

@@ -85,7 +85,7 @@ func (b *BidRequest) PDFilterFn(ctx context.Context) func(a *logic.Activity, ind
 		if len(b.Imp) == 0 {
 			return false, true
 		}
-		if len(b.Imp[0].Pmp.Deals) == 0 {
+		if len(b.Imp[0].Pmp) == 0 {
 			if len(a.Pmp) == 0 {
 				return false, true
 			} else {
@@ -96,7 +96,7 @@ func (b *BidRequest) PDFilterFn(ctx context.Context) func(a *logic.Activity, ind
 				return true, true
 			}
 		}
-		for _, deal := range b.Imp[0].Pmp.Deals {
+		for _, deal := range b.Imp[0].Pmp {
 			for i, pmp := range a.Pmp {
 				if pmp.Match(deal.Id) && deal.Price <= a.Price() {
 					a.SetDeal(i)

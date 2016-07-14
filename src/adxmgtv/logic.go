@@ -40,6 +40,12 @@ func filterAd(ctx context.Context, request *BidRequest) (*logic.Activities, erro
 	location, _ := request.GetLocation(ctx)
 	candidateAds.LocationFilter(ctx, location)
 
+	//duration filter
+	candidateAds.DurationFilter(ctx, request.VideoDuration(ctx))
+
+	//adtype filter
+	candidateAds.AdTypeFilter(ctx, request.AdType(ctx))
+
 	// schedule time  filter
 	candidateAds.ScheduleFilter(ctx, time.Now()) //here should cache
 

@@ -83,9 +83,9 @@ func WinNoticeHandler(ctx context.Context, w http.ResponseWriter, r *http.Reques
 	if strings.HasSuffix(r.URL.Path, "win") {
 		select {
 		case Feedback.Input <- feedback.Record{
-			Uid:      formsString(forms, "uid"),
+			Uid:      formsString(forms, "d"),
 			Type:     feedback.RecordImpressionType,
-			Activity: formInt(forms, "aid"),
+			Activity: formInt(forms, "cd"),
 		}:
 		default:
 			clog.Error("feedback queue full:%s", forms.Encode())

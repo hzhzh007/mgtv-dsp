@@ -71,6 +71,7 @@ func (f *FreqValue) IncActivityFreqByOneSetting(freqSetting logic.FrequencyStrat
 	for i := 0; i < len(f.Impression); {
 		if f.Impression[i].Expire < int32(now) {
 			f.Impression = append(f.Impression[:i], f.Impression[i+1:]...)
+			continue
 		}
 		if id == f.Impression[i].Id &&
 			int32(f.Impression[i].Type) == int32(freqSetting.Type) {

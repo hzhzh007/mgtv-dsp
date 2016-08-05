@@ -119,6 +119,19 @@ func (activities Activities) AdTypeFilter(ctx context.Context, adType int) {
 	}
 }
 
+func (activities Activities) ProbabilityFilter(ctx context.Context) {
+	clog := ctx.Value(ContextLogKey).(*clog.ServerContext)
+	for i := 0; i < len(activities); i++ {
+		if activities[i].Filtered() {
+			continue
+		}
+		if !activities[i].Percent.UnderProbability() {
+			activities[i].SetFiltered()
+			clog.Debug("%s filtered by probability ", activities[i].ActiveId())
+		}
+	}
+}
+
 //TODO: use binary search
 func (activities Activities) GetActivityById(id int) (*Activity, error) {
 	for i := 0; i < len(activities); i++ {

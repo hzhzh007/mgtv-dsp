@@ -6,6 +6,10 @@ import (
 	"time"
 )
 
+const (
+	ActivityStatusRun = 1
+)
+
 type Activity struct {
 	//activity id
 	Id int `yaml:"id"`
@@ -25,6 +29,7 @@ type Activity struct {
 	Click           []string    `yaml:"click_url"`
 	MonitorUrl      Impressions `yaml:"monitor_url"`
 	LandingPage     string      `yaml:"landing_page"`
+	Percent         Probability `yaml:"percent"` //0-10000
 	MaxPrice        int         `yaml:"max_price"`
 	Pmp             []PMP       `yaml:"pmp"`
 
@@ -35,6 +40,7 @@ type Activity struct {
 	filtered          bool
 	selectedCreateive *Creative
 	selectedDeal      *PMP
+	Status            int `yaml:"status"`
 	//the below is the extention as the dsp developed
 	//ExcludeLocations []Location   `yaml:"exclude_location"`
 }
@@ -89,7 +95,7 @@ func (a *Activity) TagOK(userTag []Tag) bool {
 }
 
 func (a *Activity) Filtered() bool {
-	return a.filtered
+	return a.filtered || a.Status != ActivityStatusRun
 }
 
 func (a *Activity) SetFiltered() bool {

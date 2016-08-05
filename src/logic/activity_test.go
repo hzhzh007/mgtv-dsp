@@ -80,3 +80,24 @@ func Test_TagNormalExlucdeAndIncludeOk(t *testing.T) {
 	tag = []Tag{4000101}
 	assert.False(a.TagOK(tag))
 }
+
+func Test_Status(t *testing.T) {
+	assert := assert.New(t)
+	a := Activity{
+		filtered: false,
+	}
+	assert.True(a.Filtered())
+
+	a.Status = 1
+	assert.False(a.Filtered())
+
+	a.Status = 2
+	assert.True(a.Filtered())
+
+	a.filtered = true
+	assert.True(a.Filtered())
+
+	a.filtered = true
+	a.Status = 2
+	assert.True(a.Filtered())
+}

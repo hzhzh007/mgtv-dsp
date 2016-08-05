@@ -96,6 +96,12 @@ func (f *Feedback) Worker() {
 	for record := range f.Input {
 		clog.Log.Debug("received a record:%v", record)
 		redisConn := redisPool.Get()
+
+		err := dynamic.IncrActivityFlow(redisConn, record.Activity, dynamic.FlowImpressionType)
+		if err != nil {
+			clog.Log.Error("inc flow error:%s", err)
+		}
+
 		activity, err := f.GetActivityById(record.Activity)
 		if err != nil {
 			clog.Log.Error("get activity by id err:%s", err)
@@ -104,14 +110,10 @@ func (f *Feedback) Worker() {
 		}
 
 		if len(activity.Frequency) > 0 {
-			err := f.incFrequency(redisConn, record, activity)
+			err = f.incFrequency(redisConn, record, activity)
 			if err != nil {
 				clog.Log.Error("inc freq error:%s", err)
 			}
-		}
-		err = dynamic.IncrActivityFlow(redisConn, activity.Id, dynamic.FlowImpressionType)
-		if err != nil {
-			clog.Log.Error("inc flow error:%s", err)
 		}
 		redisConn.Close()
 	}

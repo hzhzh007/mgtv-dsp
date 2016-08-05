@@ -9,6 +9,7 @@ import (
 	"golang.org/x/net/context"
 	"logic"
 	"resource"
+	"strconv"
 	"tag"
 	"time"
 )
@@ -18,13 +19,17 @@ func filterAd(ctx context.Context, request *BidRequest) (*logic.Activities, erro
 	clog := ctx.Value(ContextLogKey).(*clog.ServerContext)
 	resource := ctx.Value(ResourceKey).(*resource.Resource)
 	redisPool := ctx.Value(RedisKey).(*redis.Pool)
-	redisConn := redisPool.Get()
-	defer redisConn.Close()
 	candidateAds, err := resource.GetActivitiesCopy(request, true)
 	if err != nil {
 		clog.Error("get candidateAds error:%s", err)
 		return candidateAds, err
 	}
+	//log some info
+	clog.AddNotes("vid", strconv.Itoa(request.Video.VideoId))
+	clog.AddNotes("hid", strconv.Itoa(request.Video.CollectionId))
+	clog.AddNotes("v_len", strconv.Itoa(request.Video.Duration))
+	clog.AddNotes("type", strconv.Itoa(request.Device.Type))
+	clog.AddNotes("channel", strconv.Itoa(request.Device.Type))
 
 	//log some info
 	request.LogInfo(ctx, candidateAds)
@@ -35,6 +40,9 @@ func filterAd(ctx context.Context, request *BidRequest) (*logic.Activities, erro
 
 	//pd, prefer deal
 	candidateAds.CommonFilter(ctx, request.PDFilterFn(ctx), "pd")
+
+	//probability
+	candidateAds.ProbabilityFilter(ctx)
 
 	//location filter
 	location, _ := request.GetLocation(ctx)
@@ -66,6 +74,10 @@ func filterAd(ctx context.Context, request *BidRequest) (*logic.Activities, erro
 	localTags := bridge.RpcUserTag2LogicTag(userTags)
 	clog.AddNotes("tags", fmt.Sprintf("%v", localTags))
 	candidateAds.UserTagFilter(ctx, localTags)
+
+	//get redis connection
+	redisConn := redisPool.Get()
+	defer redisConn.Close()
 
 	//frequncyFilter
 	candidateAds.CommonFilter(ctx, request.FrequencyFilterFn(ctx, redisConn), "freq")
